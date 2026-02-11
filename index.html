@@ -14,9 +14,10 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            touch-action: manipulation;
         }
 
-        /* TELÓN QUE SE ABRE AL MEDIO */
+        /* TELÓN */
         .curtain-container {
             position: fixed;
             top: 0;
@@ -25,19 +26,15 @@
             height: 100%;
             z-index: 1000;
             display: flex;
-            cursor: pointer;
         }
 
         .curtain-half {
             width: 50%;
             height: 100%;
             background-color: #8a0e2a;
-            transition: transform 1.2s ease-in-out;
+            transition: transform 1s ease-in-out;
             box-shadow: inset 10px 0 15px rgba(0,0,0,0.5);
         }
-
-        .curtain-left { border-right: 2px solid #590d22; }
-        .curtain-right { border-left: 2px solid #590d22; }
 
         .curtain-text {
             position: absolute;
@@ -47,27 +44,23 @@
             color: white;
             text-align: center;
             z-index: 1001;
-            pointer-events: none;
+            width: 100%;
         }
 
-        /* Cuando se abre */
         .open .curtain-left { transform: translateX(-100%); }
         .open .curtain-right { transform: translateX(100%); }
-        .open .curtain-text { display: none; }
+        .open .curtain-text { opacity: 0; pointer-events: none; }
 
-        /* CONTENIDO */
+        /* CARTA */
         .card {
             background: white;
             border: 6px solid #ff4d6d;
             padding: 20px;
             text-align: center;
             box-shadow: 8px 8px 0px #c9184a;
-            width: 85%;
-            max-width: 300px;
+            width: 280px;
+            z-index: 10;
         }
-
-        h1 { color: #ff4d6d; font-size: 20px; margin: 10px 0; }
-        p { color: #590d22; font-weight: bold; font-size: 16px; }
 
         .btn-group {
             display: flex;
@@ -77,33 +70,33 @@
         }
 
         button {
-            padding: 12px 18px;
-            font-family: inherit;
+            padding: 15px 20px;
             font-weight: bold;
             border: 3px solid black;
             cursor: pointer;
+            font-family: inherit;
         }
 
-        #si { background: #70e000; box-shadow: 3px 3px 0 #38b000; }
-        #no { background: #ff4d6d; box-shadow: 3px 3px 0 #c9184a; }
+        #si { background: #70e000; }
+        #no { background: #ff4d6d; position: relative; }
 
-        /* EFECTO CORAZONES */
-        .heart-particle {
+        /* CORAZONES EXPLOSIVOS */
+        .h-exp {
             position: fixed;
+            z-index: 9999;
             pointer-events: none;
-            z-index: 2000;
-            animation: burst 1s ease-out forwards;
+            animation: fly 1s forwards;
         }
 
-        @keyframes burst {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        @keyframes fly {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="curtain-container" id="curtain" onclick="this.classList.add('open')">
+    <div class="curtain-container" id="curtain" onclick="this.classList.add('open')" ontouchstart="this.classList.add('open')">
         <div class="curtain-half curtain-left"></div>
         <div class="curtain-text">
             <h2>VALENTINE?</h2>
@@ -114,43 +107,58 @@
 
     <div class="card">
         <div style="font-size: 50px;">🐱</div>
-        <h1>¿Queres ser mi VALENTINE?</h1>
-        <p>Sos la MEJOR persona del mundo.<br>Te amo infinitamente💕</p>
+        <h2 style="color: #ff4d6d; font-size: 18px;">¿Queres ser mi VALENTINE?</h2>
+        <p style="color: #590d22; font-size: 14px;">Sos la MEJOR persona del mundo.<br>Te amo infinitamente💕</p>
         <div class="btn-group">
-            <button id="si" onclick="celebrar(event)">SÍ</button>
-            <button id="no" onmouseover="escapar(this)" onclick="escapar(this)">NO</button>
+            <button id="si">SÍ</button>
+            <button id="no">NO</button>
         </div>
     </div>
 
     <script>
-        function escapar(btn) {
-            const x = Math.random() * (window.innerWidth - btn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - btn.offsetHeight);
-            btn.style.position = "fixed";
-            btn.style.left = x + "px";
-            btn.style.top = y + "px";
-        }
+        const btnSi = document.getElementById('si');
+        const btnNo = document.getElementById('no');
 
-        function celebrar(e) {
-            // Crear corazones
+        // FUNCIÓN DE EXPLOSIÓN
+        function explotar(e) {
+            // Prevenir otros clics
+            e.preventDefault();
+            
+            const touch = e.touches ? e.touches[0] : e;
+            
             for(let i=0; i<30; i++) {
                 const h = document.createElement('div');
                 h.innerHTML = "❤️";
-                h.className = 'heart-particle';
-                h.style.left = e.clientX + "px";
-                h.style.top = e.clientY + "px";
-                h.style.setProperty('--dx', (Math.random() - 0.5) * 400 + "px");
-                h.style.setProperty('--dy', (Math.random() - 0.5) * 400 + "px");
+                h.className = 'h-exp';
+                h.style.left = touch.clientX + "px";
+                h.style.top = touch.clientY + "px";
+                h.style.setProperty('--x', (Math.random() - 0.5) * 500 + "px");
+                h.style.setProperty('--y', (Math.random() - 0.5) * 500 + "px");
                 document.body.appendChild(h);
                 setTimeout(() => h.remove(), 1000);
             }
-            
-            // Mensaje final
+
             setTimeout(() => {
                 alert("ya sabia que ibas a decir que si mi gorda hermosa❤️");
                 location.reload();
-            }, 800);
+            }, 500);
         }
+
+        // ASIGNACIÓN DE EVENTOS (Doble método para asegurar)
+        btnSi.onclick = explotar;
+        btnSi.ontouchstart = explotar;
+
+        // BOTÓN NO SE ESCAPA
+        function moverNo(e) {
+            const x = Math.random() * (window.innerWidth - btnNo.offsetWidth);
+            const y = Math.random() * (window.innerHeight - btnNo.offsetHeight);
+            btnNo.style.position = "fixed";
+            btnNo.style.left = x + "px";
+            btnNo.style.top = y + "px";
+        }
+
+        btnNo.onmouseover = moverNo;
+        btnNo.ontouchstart = moverNo;
     </script>
 </body>
 </html>

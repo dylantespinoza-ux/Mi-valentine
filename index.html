@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¿Queres ser mi VALENTINE?</title>
     <style>
-        /* Estilo General */
         body {
             background-color: #ff85a2;
             background-image: radial-gradient(#ffb3c1 20%, transparent 20%), radial-gradient(#ffb3c1 20%, transparent 20%);
@@ -20,7 +19,7 @@
             overflow: hidden;
         }
 
-        /* TELÓN PIXEL ART QUE SE ABRE AL MEDIO */
+        /* TELÓN */
         .telon-wrapper {
             position: fixed;
             top: 0;
@@ -35,14 +34,12 @@
         .ala {
             width: 50%;
             height: 100%;
-            background-color: #8a0e2a; /* Rojo oscuro base */
+            background-color: #8a0e2a;
             position: relative;
             transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1);
-            /* Simulación de pliegues Pixel Art */
             box-shadow: inset 20px 0px 0px #a4133c, inset -20px 0px 0px #590d22;
         }
 
-        /* Texto de la intro */
         .intro-text {
             position: absolute;
             top: 50%;
@@ -56,36 +53,20 @@
             transition: opacity 0.5s;
         }
 
-        .intro-text h2 {
-            font-size: 40px;
-            text-shadow: 5px 5px 0px #000;
-            margin-bottom: 15px;
-        }
+        .intro-text h2 { font-size: 40px; text-shadow: 5px 5px 0px #000; }
 
-        .intro-text p {
-            font-size: 14px;
-            color: #ffb3c1;
-            animation: parpadeo 1.5s infinite;
-        }
-
-        @keyframes parpadeo {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
-
-        /* Movimiento de apertura */
         .abierto .ala-izquierda { transform: translateX(-100%); }
         .abierto .ala-derecha { transform: translateX(100%); }
         .abierto .intro-text { opacity: 0; visibility: hidden; }
 
-        /* Contenedor Principal (La carta) */
+        /* CONTENEDOR */
         .container {
             background-color: white;
             border: 8px solid #ff4d6d;
             padding: 30px;
             text-align: center;
             box-shadow: 10px 10px 0px #c9184a;
-            max-width: 350px;
+            max-width: 320px;
             z-index: 10;
             border-radius: 5px;
         }
@@ -103,32 +84,29 @@
         #btnSi { background-color: #70e000; box-shadow: 3px 3px 0px #38b000; }
         #btnNo { background-color: #ff4d6d; box-shadow: 3px 3px 0px #c9184a; position: relative; }
 
-        /* Estilos para los corazones que aparecen al hacer clic en SÍ */
-        .heart-explosion {
-            position: absolute;
-            font-size: 25px;
-            color: #ff4d6d;
-            animation: explodeHeart 1s forwards ease-out;
-            pointer-events: none; /* Para que no interfieran con clics */
-            opacity: 0; /* Empieza invisible */
+        /* EFECTO CORAZONES EXPLOSIÓN */
+        .heart-pop {
+            position: fixed;
             z-index: 200;
+            font-size: 30px;
+            pointer-events: none;
+            animation: move-up 1.5s ease-out forwards;
         }
 
-        @keyframes explodeHeart {
-            0% { transform: scale(0); opacity: 1; }
-            50% { transform: scale(1.5) translateY(-50px); opacity: 0.8; }
-            100% { transform: scale(0.5) translateY(-100px); opacity: 0; }
+        @keyframes move-up {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(1.5); opacity: 0; }
         }
 
-        /* Corazones de fondo que flotan */
-        .heart {
+        /* Corazones de fondo */
+        .heart-bg {
             position: absolute; color: #ff4d6d; font-size: 20px;
-            animation: float 3s linear infinite; z-index: 1;
+            animation: float-bg 3s linear infinite; z-index: 1;
         }
 
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        @keyframes float-bg {
+            0% { transform: translateY(110vh); opacity: 1; }
+            100% { transform: translateY(-10vh); opacity: 0; }
         }
     </style>
 </head>
@@ -136,9 +114,9 @@
 
     <div class="telon-wrapper" id="telonWrapper" onclick="abrirTelon()">
         <div class="ala ala-izquierda"></div>
-        <div class="intro-text" id="introTexto">
+        <div class="intro-text">
             <h2>VALENTINE?</h2>
-            <p>Presiona en cualquier lugar para abrir el telón...</p>
+            <p>Presiona para abrir el telón...</p>
         </div>
         <div class="ala ala-derecha"></div>
     </div>
@@ -147,9 +125,8 @@
         <div class="cat-pixel">🐱</div>
         <h1>¿Queres ser mi VALENTINE?</h1>
         <p class="mensaje-p">Sos la MEJOR persona del mundo.<br>Te amo infinitamente💕</p>
-        
         <div class="buttons">
-            <button id="btnSi" onclick="aceptar(event)">SÍ</button>
+            <button id="btnSi" onclick="aceptar()">SÍ</button>
             <button id="btnNo" onmouseover="moverBoton(this)" onclick="moverBoton(this)">NO</button>
         </div>
     </div>
@@ -167,52 +144,40 @@
             btn.style.top = y + "px";
         }
 
-        // --- FUNCIÓN MEJORADA PARA ACEPTAR ---
-        function aceptar(event) {
-            event.stopPropagation();
-            
-            // Obtener la posición del botón SÍ
-            const btnSi = document.getElementById('btnSi');
-            const rect = btnSi.getBoundingClientRect();
-            const btnCenterX = rect.left + rect.width / 2;
-            const btnCenterY = rect.top + rect.height / 2;
-
-            // Crear y animar múltiples corazones
-            for (let i = 0; i < 20; i++) { // Generar 20 corazones
-                const heart = document.createElement("div");
-                heart.innerHTML = "❤️"; // Corazón rojo
-                heart.classList.add("heart-explosion");
+        function aceptar() {
+            // Crear explosión de corazones
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.className = 'heart-pop';
+                heart.style.left = '50%';
+                heart.style.top = '50%';
                 
-                // Posición inicial cerca del botón "SÍ"
-                heart.style.left = (btnCenterX + (Math.random() - 0.5) * 50) + "px";
-                heart.style.top = (btnCenterY + (Math.random() - 0.5) * 50) + "px";
-                
-                // Variar el tamaño y duración de la animación
-                heart.style.fontSize = (Math.random() * 20 + 15) + "px"; // Entre 15px y 35px
-                heart.style.animationDuration = (Math.random() * 0.8 + 0.7) + "s"; // Entre 0.7s y 1.5s
+                // Direcciones aleatorias para la explosión
+                const x = (Math.random() - 0.5) * 400 + 'px';
+                const y = (Math.random() - 0.5) * 400 + 'px';
+                heart.style.setProperty('--x', x);
+                heart.style.setProperty('--y', y);
                 
                 document.body.appendChild(heart);
-
-                // Remover el corazón después de su animación
-                heart.addEventListener('animationend', () => heart.remove());
+                setTimeout(() => heart.remove(), 1500);
             }
 
-            // Opcional: Mostrar el alert DESPUÉS de la explosión de corazones
+            // Mostrar el mensaje final
             setTimeout(() => {
                 alert("ya sabia que ibas a decir que si mi gorda hermosa❤️");
-                location.reload(); 
-            }, 1000); // Espera 1 segundo para que los corazones exploten
+                location.reload();
+            }, 500);
         }
 
-        // Generador de corazones de fondo que flotan
+        // Lluvia de corazones constante
         setInterval(() => {
             const heart = document.createElement("div");
             heart.innerHTML = "❤";
-            heart.classList.add("heart");
+            heart.className = "heart-bg";
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (Math.random() * 3 + 2) + "s";
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 5000);
+            setTimeout(() => heart.remove(), 3000);
         }, 400);
     </script>
 </body>

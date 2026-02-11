@@ -17,7 +17,7 @@
             touch-action: manipulation;
         }
 
-        /* TELÓN */
+        /* TELÓN REALISTA */
         .curtain-container {
             position: fixed;
             top: 0;
@@ -32,9 +32,14 @@
             width: 50%;
             height: 100%;
             background-color: #8a0e2a;
-            transition: transform 1s ease-in-out;
-            box-shadow: inset 10px 0 15px rgba(0,0,0,0.5);
+            transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+            box-shadow: inset 10px 0 20px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
         }
+
+        .curtain-left { border-right: 3px solid #590d22; justify-content: flex-end; }
+        .curtain-right { border-left: 3px solid #590d22; justify-content: flex-start; }
 
         .curtain-text {
             position: absolute;
@@ -54,61 +59,78 @@
         /* CARTA */
         .card {
             background: white;
-            border: 6px solid #ff4d6d;
-            padding: 20px;
+            border: 8px solid #ff4d6d;
+            padding: 25px;
             text-align: center;
-            box-shadow: 8px 8px 0px #c9184a;
-            width: 280px;
+            box-shadow: 10px 10px 0px #c9184a;
+            width: 290px;
             z-index: 10;
+            border-radius: 4px;
+        }
+
+        h2 { color: #ff4d6d; font-size: 20px; margin-bottom: 15px; }
+        
+        /* Efecto Typewriter */
+        #typewriter {
+            color: #590d22;
+            font-size: 16px;
+            font-weight: bold;
+            min-height: 50px;
+            line-height: 1.5;
         }
 
         .btn-group {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 25px;
         }
 
         button {
-            padding: 15px 20px;
+            padding: 15px 22px;
             font-weight: bold;
             border: 3px solid black;
             cursor: pointer;
             font-family: inherit;
+            transition: 0.2s;
         }
 
-        #si { background: #70e000; }
-        #no { background: #ff4d6d; position: relative; }
+        #si { background: #70e000; box-shadow: 4px 4px 0px #38b000; }
+        #no { background: #ff4d6d; box-shadow: 4px 4px 0px #c9184a; position: relative; }
 
-        /* CORAZONES EXPLOSIVOS */
+        /* PARTÍCULAS */
         .h-exp {
             position: fixed;
             z-index: 9999;
             pointer-events: none;
-            animation: fly 1s forwards;
+            animation: fly 1.2s forwards;
         }
 
         @keyframes fly {
-            0% { transform: translate(0,0) scale(1); opacity: 1; }
-            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+            0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0) rotate(360deg); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <div class="curtain-container" id="curtain" onclick="this.classList.add('open')" ontouchstart="this.classList.add('open')">
+    <audio id="musica" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="curtain-container" id="curtain" onclick="iniciarTodo()" ontouchstart="iniciarTodo()">
         <div class="curtain-half curtain-left"></div>
         <div class="curtain-text">
-            <h2>VALENTINE?</h2>
-            <p>Toca para abrir...</p>
+            <h1 style="font-size: 40px; text-shadow: 4px 4px 0#000;">VALENTINE?</h1>
+            <p style="animation: parpadeo 1.5s infinite;">Toca para abrir...</p>
         </div>
         <div class="curtain-half curtain-right"></div>
     </div>
 
     <div class="card">
-        <div style="font-size: 50px;">🐱</div>
-        <h2 style="color: #ff4d6d; font-size: 18px;">¿Queres ser mi VALENTINE?</h2>
-        <p style="color: #590d22; font-size: 14px;">Sos la MEJOR persona del mundo.<br>Te amo infinitamente💕</p>
+        <div style="font-size: 55px;">🐱</div>
+        <h2 id="titulo"></h2>
+        <div id="typewriter"></div>
         <div class="btn-group">
             <button id="si">SÍ</button>
             <button id="no">NO</button>
@@ -116,49 +138,83 @@
     </div>
 
     <script>
+        const curtain = document.getElementById('curtain');
+        const typewriter = document.getElementById('typewriter');
+        const titulo = document.getElementById('titulo');
         const btnSi = document.getElementById('si');
         const btnNo = document.getElementById('no');
+        const musica = document.getElementById('musica');
 
-        // FUNCIÓN DE EXPLOSIÓN
+        const textoMensaje = "Sos la MEJOR persona del mundo. Te amo infinitamente💕";
+        const frasesNo = ["¿Segura? 🥺", "Piénsalo bien...", "¡Casi!", "¡Ni lo pienses!", "¡Epa! 🚫", "Obligatorio: SÍ"];
+
+        let iniciado = false;
+
+        function iniciarTodo() {
+            if (iniciado) return;
+            iniciado = true;
+            curtain.classList.add('open');
+            musica.play().catch(() => console.log("Audio bloqueado por el navegador"));
+            
+            // Iniciar Typewriter después de abrir telón
+            setTimeout(() => {
+                titulo.innerHTML = "¿Queres ser mi VALENTINE?";
+                escribirTexto(0);
+            }, 1000);
+        }
+
+        function escribirTexto(i) {
+            if (i < textoMensaje.length) {
+                typewriter.innerHTML += textoMensaje.charAt(i);
+                setTimeout(() => escribirTexto(i + 1), 50);
+            }
+        }
+
+        // EXPLOSIÓN DE CORAZONES Y FLORES
         function explotar(e) {
-            // Prevenir otros clics
             e.preventDefault();
-            
             const touch = e.touches ? e.touches[0] : e;
+            const iconos = ["❤️", "🌸", "✨", "💕", "🌷"];
             
-            for(let i=0; i<30; i++) {
+            for(let i=0; i<40; i++) {
                 const h = document.createElement('div');
-                h.innerHTML = "❤️";
+                h.innerHTML = iconos[Math.floor(Math.random() * iconos.length)];
                 h.className = 'h-exp';
                 h.style.left = touch.clientX + "px";
                 h.style.top = touch.clientY + "px";
-                h.style.setProperty('--x', (Math.random() - 0.5) * 500 + "px");
-                h.style.setProperty('--y', (Math.random() - 0.5) * 500 + "px");
+                h.style.fontSize = Math.random() * 20 + 20 + "px";
+                h.style.setProperty('--x', (Math.random() - 0.5) * 600 + "px");
+                h.style.setProperty('--y', (Math.random() - 0.5) * 600 + "px");
                 document.body.appendChild(h);
-                setTimeout(() => h.remove(), 1000);
+                setTimeout(() => h.remove(), 1200);
             }
 
             setTimeout(() => {
                 alert("ya sabia que ibas a decir que si mi gorda hermosa❤️");
                 location.reload();
-            }, 500);
+            }, 800);
         }
 
-        // ASIGNACIÓN DE EVENTOS (Doble método para asegurar)
         btnSi.onclick = explotar;
         btnSi.ontouchstart = explotar;
 
-        // BOTÓN NO SE ESCAPA
+        // BOTÓN NO SE ESCAPA CON TEXTO CAMBIANTE
         function moverNo(e) {
+            e.preventDefault();
             const x = Math.random() * (window.innerWidth - btnNo.offsetWidth);
             const y = Math.random() * (window.innerHeight - btnNo.offsetHeight);
             btnNo.style.position = "fixed";
             btnNo.style.left = x + "px";
             btnNo.style.top = y + "px";
+            
+            // Cambiar texto del botón No
+            btnNo.innerHTML = frasesNo[Math.floor(Math.random() * frasesNo.length)];
         }
 
         btnNo.onmouseover = moverNo;
         btnNo.ontouchstart = moverNo;
+
+        @keyframes parpadeo { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </script>
 </body>
 </html>

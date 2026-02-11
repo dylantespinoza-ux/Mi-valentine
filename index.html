@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¿Quieres ser mi Valentine?</title>
+    <title>¿Queres ser mi Valentine?</title>
     <style>
-        /* Estilo Retro Pixel Art */
         body {
-            background-color: #ff85a2; /* Rosa de fondo */
+            background-color: #ff85a2;
             background-image: radial-gradient(#ffb3c1 20%, transparent 20%), radial-gradient(#ffb3c1 20%, transparent 20%);
             background-position: 0 0, 25px 25px;
             background-size: 50px 50px;
@@ -44,6 +43,7 @@
         p {
             color: #590d22;
             font-weight: bold;
+            font-size: 18px;
         }
 
         .buttons {
@@ -74,7 +74,6 @@
             position: relative;
         }
 
-        /* Animación de corazones flotando */
         .heart {
             position: absolute;
             color: #ff4d6d;
@@ -93,17 +92,16 @@
 
     <div class="container">
         <div class="cat-pixel">🐱</div>
-        <h1>¿Quieres ser mi Valentine?</h1>
-        <p>Eres la mejor persona del mundo y me haces muy feliz. <br> ¡Te amo infinitamente!</p>
+        <h1>¿Queres ser mi Valentine?</h1>
+        <p>Sos la mejor persona del mundo te amo infinitamente</p>
         
         <div class="buttons">
             <button id="btnSi" onclick="aceptar()">SÍ</button>
-            <button id="btnNo" onmouseover="moverBoton(this)">NO</button>
+            <button id="btnNo" onmouseover="moverBoton(this)" onclick="moverBoton(this)">NO</button>
         </div>
     </div>
 
     <script>
-        // Función para que el botón "No" se mueva al intentar tocarlo
         function moverBoton(btn) {
             const x = Math.random() * (window.innerWidth - btn.offsetWidth);
             const y = Math.random() * (window.innerHeight - btn.offsetHeight);
@@ -113,11 +111,11 @@
         }
 
         function aceptar() {
-            alert("¡SABÍA QUE DIRÍAS QUE SÍ! ❤️ Te amo.");
-            location.reload(); // Reinicia la página
+            // Nuevo mensaje personalizado
+            alert("ya sabia que ibas a decir que si mi gorda hermosa❤️");
+            location.reload(); 
         }
 
-        // Crear corazones de fondo
         setInterval(() => {
             const heart = document.createElement("div");
             heart.innerHTML = "❤";

@@ -20,7 +20,7 @@
             touch-action: manipulation;
         }
 
-        /* --- TELÓN MEJORADO --- */
+        /* --- TELÓN --- */
         #telon {
             position: fixed;
             top: 0;
@@ -67,37 +67,50 @@
         /* --- CARTA --- */
         .container {
             background-color: white;
-            padding: 25px;
+            padding: 20px;
             border: 8px solid #ff4d6d;
             border-radius: 15px;
             text-align: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             max-width: 320px;
-            width: 90%;
+            width: 85%;
             z-index: 10;
             opacity: 0;
             transform: scale(0.8);
             transition: all 1s ease 0.6s;
+            display: block;
         }
 
         .mostrar-contenido { opacity: 1; transform: scale(1); }
 
-        .foto-pareja {
+        .foto-wrapper {
             width: 100%;
+            min-height: 150px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #fff0f3;
+            border-radius: 10px;
+        }
+
+        .foto-pareja {
+            max-width: 100%;
+            max-height: 250px;
             border-radius: 10px;
             border: 4px solid #ffb3c1;
-            margin-bottom: 15px;
+            object-fit: cover;
         }
 
         #texto-maquina {
-            font-size: 17px;
+            font-size: 16px;
             color: #590d22;
             font-weight: bold;
-            min-height: 60px;
-            margin-bottom: 20px;
+            min-height: 80px;
+            margin-bottom: 15px;
+            line-height: 1.4;
         }
 
-        /* Botones */
         .botones { display: flex; justify-content: center; gap: 15px; }
 
         button {
@@ -112,7 +125,6 @@
         #btnSi { background-color: #70e000; box-shadow: 0 5px 0 #38b000; color: white; }
         #btnNo { background-color: #ff4d6d; box-shadow: 0 5px 0 #c9184a; color: white; position: relative; }
 
-        /* Partículas de explosión */
         .particula {
             position: fixed;
             pointer-events: none;
@@ -136,17 +148,19 @@
         <source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Chapter_One__Cold/Kai_Engel_-_04_-_Moonlight_Reprise.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="telon" onclick="abrirTodo()" ontouchstart="abrirTodo()">
+    <div id="telon" onclick="abrirTodo(event)" ontouchstart="abrirTodo(event)">
         <div class="panel panel-izq"></div>
         <div class="texto-telon">
             <h1>VALENTINE?</h1>
-            <p style="animation: pulse 1.5s infinite;">Toca para abrir ❤️</p>
+            <p>Toca para abrir ❤️</p>
         </div>
         <div class="panel panel-der"></div>
     </div>
 
     <div class="container" id="carta">
-        <img src="imagen.JPG" alt="Nosotros" class="foto-pareja">
+        <div class="foto-wrapper">
+            <img src="image.JPG" alt="Nosotros" class="foto-pareja" onerror="this.src='https://via.placeholder.com/300x250?text=Error+al+cargar+image.JPG'">
+        </div>
         
         <div id="texto-maquina"></div>
         
@@ -165,14 +179,18 @@
         const btnNo = document.getElementById('btnNo');
 
         const mensaje = "¿Queres ser mi VALENTINE? Sos la MEJOR persona del mundo. Te amo infinitamente 💕";
-        const frasesNo = ["¿Segura? 🥺", "Piénsalo bien...", "¡Casi!", "No puedes decir no", "¡Epa! 🏃‍♀️"];
+        const frasesNo = ["¿Segura? 🥺", "Piénsalo bien...", "¡Casi!", "No puedes", "¡Epa! 🏃‍♀️"];
 
-        function abrirTodo() {
+        let yaAbierto = false;
+
+        function abrirTodo(e) {
+            if (yaAbierto) return;
+            yaAbierto = true;
+            
             telon.classList.add('abierto');
             carta.classList.add('mostrar-contenido');
-            musica.play().catch(() => console.log("Audio esperando clic"));
+            musica.play().catch(() => {});
 
-            // Typewriter
             let i = 0;
             textoDiv.innerHTML = "";
             function escribir() {
@@ -185,9 +203,8 @@
             setTimeout(escribir, 1000);
         }
 
-        // Botón No "Troll"
         function moverNo(e) {
-            if(e.type === 'touchstart') e.preventDefault();
+            e.preventDefault();
             const x = Math.random() * (window.innerWidth - btnNo.offsetWidth - 20);
             const y = Math.random() * (window.innerHeight - btnNo.offsetHeight - 20);
             btnNo.style.position = "fixed";
@@ -199,8 +216,8 @@
         btnNo.addEventListener('mouseover', moverNo);
         btnNo.addEventListener('touchstart', moverNo);
 
-        // Explosión al decir SÍ
         function celebrar(e) {
+            e.preventDefault();
             const touch = e.touches ? e.touches[0] : e;
             const iconos = ["❤️", "🌸", "✨", "💕", "🌹"];
             for (let i = 0; i < 40; i++) {

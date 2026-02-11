@@ -20,44 +20,63 @@
             overflow: hidden;
         }
 
-        /* Estilo del Telón (Intro) */
-        #telon {
+        /* TELÓN PIXEL ART QUE SE ABRE AL MEDIO */
+        .telon-wrapper {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #c9184a; 
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             z-index: 100;
-            transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-            color: white;
-            text-align: center;
             cursor: pointer;
         }
 
-        #telon h2 {
-            font-size: 45px;
-            text-shadow: 4px 4px 0px #590d22;
-            margin-bottom: 20px;
-            letter-spacing: 5px;
+        .ala {
+            width: 50%;
+            height: 100%;
+            background-color: #8a0e2a; /* Rojo oscuro base */
+            position: relative;
+            transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+            /* Simulación de pliegues Pixel Art */
+            box-shadow: inset 20px 0px 0px #a4133c, inset -20px 0px 0px #590d22;
         }
 
-        #telon p {
-            font-size: 16px;
+        /* Texto de la intro */
+        .intro-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            z-index: 110;
+            pointer-events: none;
+            width: 100%;
+            transition: opacity 0.5s;
+        }
+
+        .intro-text h2 {
+            font-size: 40px;
+            text-shadow: 5px 5px 0px #000;
+            margin-bottom: 15px;
+        }
+
+        .intro-text p {
+            font-size: 14px;
             color: #ffb3c1;
             animation: parpadeo 1.5s infinite;
-            padding: 0 20px;
         }
 
         @keyframes parpadeo {
-            0% { opacity: 1; }
+            0%, 100% { opacity: 1; }
             50% { opacity: 0.2; }
-            100% { opacity: 1; }
         }
+
+        /* Movimiento de apertura */
+        .abierto .ala-izquierda { transform: translateX(-100%); }
+        .abierto .ala-derecha { transform: translateX(100%); }
+        .abierto .intro-text { opacity: 0; visibility: hidden; }
 
         /* Contenedor Principal (La carta) */
         .container {
@@ -71,57 +90,40 @@
             border-radius: 5px;
         }
 
-        h1 {
-            color: #ff4d6d;
-            font-size: 22px;
-            text-transform: none; /* Quitamos el uppercase automático para que respete tus minúsculas */
-        }
+        h1 { color: #ff4d6d; font-size: 22px; }
+        .cat-pixel { font-size: 60px; margin-bottom: 10px; }
+        .mensaje-p { color: #590d22; font-weight: bold; font-size: 17px; line-height: 1.5; }
 
-        .cat-pixel {
-            font-size: 60px;
-            margin-bottom: 10px;
-        }
-
-        .mensaje-p {
-            color: #590d22;
-            font-weight: bold;
-            font-size: 17px;
-            line-height: 1.5;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 25px;
-        }
-
+        .buttons { display: flex; justify-content: center; gap: 15px; margin-top: 25px; }
         button {
-            padding: 12px 20px;
-            font-size: 16px;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            border: 3px solid black;
-            cursor: pointer;
+            padding: 12px 20px; font-size: 16px; font-family: 'Courier New', Courier, monospace;
+            font-weight: bold; border: 3px solid black; cursor: pointer;
         }
 
-        #btnSi {
-            background-color: #70e000;
-            box-shadow: 3px 3px 0px #38b000;
-        }
+        #btnSi { background-color: #70e000; box-shadow: 3px 3px 0px #38b000; }
+        #btnNo { background-color: #ff4d6d; box-shadow: 3px 3px 0px #c9184a; position: relative; }
 
-        #btnNo {
-            background-color: #ff4d6d;
-            box-shadow: 3px 3px 0px #c9184a;
-            position: relative;
-        }
-
-        .heart {
+        /* Estilos para los corazones que aparecen al hacer clic en SÍ */
+        .heart-explosion {
             position: absolute;
+            font-size: 25px;
             color: #ff4d6d;
-            font-size: 20px;
-            animation: float 3s linear infinite;
-            z-index: 1;
+            animation: explodeHeart 1s forwards ease-out;
+            pointer-events: none; /* Para que no interfieran con clics */
+            opacity: 0; /* Empieza invisible */
+            z-index: 200;
+        }
+
+        @keyframes explodeHeart {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5) translateY(-50px); opacity: 0.8; }
+            100% { transform: scale(0.5) translateY(-100px); opacity: 0; }
+        }
+
+        /* Corazones de fondo que flotan */
+        .heart {
+            position: absolute; color: #ff4d6d; font-size: 20px;
+            animation: float 3s linear infinite; z-index: 1;
         }
 
         @keyframes float {
@@ -130,11 +132,15 @@
         }
     </style>
 </head>
-<body onclick="quitarTelon()">
+<body>
 
-    <div id="telon">
-        <h2>VALENTINE</h2>
-        <p>Presiona en cualquier lugar para abrir el telón...</p>
+    <div class="telon-wrapper" id="telonWrapper" onclick="abrirTelon()">
+        <div class="ala ala-izquierda"></div>
+        <div class="intro-text" id="introTexto">
+            <h2>VALENTINE?</h2>
+            <p>Presiona en cualquier lugar para abrir el telón...</p>
+        </div>
+        <div class="ala ala-derecha"></div>
     </div>
 
     <div class="container">
@@ -149,9 +155,8 @@
     </div>
 
     <script>
-        function quitarTelon() {
-            const telon = document.getElementById('telon');
-            telon.style.transform = 'translateY(-100%)';
+        function abrirTelon() {
+            document.getElementById('telonWrapper').classList.add('abierto');
         }
 
         function moverBoton(btn) {
@@ -162,12 +167,44 @@
             btn.style.top = y + "px";
         }
 
+        // --- FUNCIÓN MEJORADA PARA ACEPTAR ---
         function aceptar(event) {
             event.stopPropagation();
-            alert("ya sabia que ibas a decir que si mi gorda hermosa❤️");
-            location.reload(); 
+            
+            // Obtener la posición del botón SÍ
+            const btnSi = document.getElementById('btnSi');
+            const rect = btnSi.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+
+            // Crear y animar múltiples corazones
+            for (let i = 0; i < 20; i++) { // Generar 20 corazones
+                const heart = document.createElement("div");
+                heart.innerHTML = "❤️"; // Corazón rojo
+                heart.classList.add("heart-explosion");
+                
+                // Posición inicial cerca del botón "SÍ"
+                heart.style.left = (btnCenterX + (Math.random() - 0.5) * 50) + "px";
+                heart.style.top = (btnCenterY + (Math.random() - 0.5) * 50) + "px";
+                
+                // Variar el tamaño y duración de la animación
+                heart.style.fontSize = (Math.random() * 20 + 15) + "px"; // Entre 15px y 35px
+                heart.style.animationDuration = (Math.random() * 0.8 + 0.7) + "s"; // Entre 0.7s y 1.5s
+                
+                document.body.appendChild(heart);
+
+                // Remover el corazón después de su animación
+                heart.addEventListener('animationend', () => heart.remove());
+            }
+
+            // Opcional: Mostrar el alert DESPUÉS de la explosión de corazones
+            setTimeout(() => {
+                alert("ya sabia que ibas a decir que si mi gorda hermosa❤️");
+                location.reload(); 
+            }, 1000); // Espera 1 segundo para que los corazones exploten
         }
 
+        // Generador de corazones de fondo que flotan
         setInterval(() => {
             const heart = document.createElement("div");
             heart.innerHTML = "❤";
